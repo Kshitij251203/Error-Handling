@@ -5,7 +5,7 @@ This solidity program aims at demonstrating the functionality of require(), reve
 
 ## Description
 
-This program is a simple contract written in Solidity, a programming language used for developing smart contracts on the Ethereum blockchain. The contract has functions like greaterElement() and devide(). greaterElement() function is used to return the greatest element out of the two passed values and if both the values are same then the function will not work. devide() function is used to devide numerator with denominator and if the denominator passed is equal to 0 then the function will stop working. If the numerator is not completely devisible by denominator then again the function stops working.
+This program is a simple contract written in Solidity, a programming language used for developing smart contracts on the Ethereum blockchain. The contract has functions like deposit(), withdraw() and transfer(). deposit() function is used to deposit the amount into the owners account. withdraw() function is used to withdraw the amount from the owners account. trtansfer() function is used to tranfer the amount from the owners account to the recipient account that cannot be the owners account.
 
 ## Getting Started
 
@@ -16,29 +16,42 @@ To run this program, you can use Remix, an online Solidity IDE. To get started, 
 Once you are on the Remix website, create a new file by clicking on the "+" icon in the left-hand sidebar. Save the file with a .sol extension (e.g., ErrorHandling.sol). Copy and paste the following code into the file:
 ```javascript
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.26;
+pragma solidity ^0.8.0;
 
-contract ErrorHandling {
+contract ErrorHandlingExample {
+    mapping(address => uint) public balances;
+    address public owner;
 
-    function greaterElement(uint a, uint b) public pure returns (uint){
-        assert(a !=b );
-        if(a > b){
-            return a;
-        }else{
-            return b;
-        }
+    constructor() {
+        owner = msg.sender;
     }
 
-    function devide(uint numerator , uint denominator) public pure returns (uint){
-       
-        require(denominator != 0,"Cannot devide by 0");
+    function deposit(uint amount) public {
+        assert(amount > 0);
+        balances[msg.sender] += amount;
+    }
 
-        if(numerator % denominator != 0){
-            revert("Numerator must be devisible by the Denominator");
+    function withdraw(uint amount) public {
+        require(amount > 0, "Withdrawal amount must be greater than zero");
+
+        if(balances[msg.sender] < amount){
+            revert("Insufficient balance");
+        }
+        
+        balances[msg.sender] -= amount;
+    }
+
+    function transfer(address recipient, uint amount) public {
+        assert(recipient != owner);
+        require(amount > 0, "Transfer amount must be greater than zero");
+        if(balances[msg.sender] < amount){
+            revert("Insufficient balance");
         }
 
-        return numerator / denominator;
+        balances[msg.sender] -= amount;
+        balances[recipient] += amount;
     }
+
     
 }
 
@@ -48,7 +61,7 @@ To compile the code, click on the "Solidity Compiler" tab in the left-hand sideb
 
 Once the code is compiled, you can deploy the contract by clicking on the "Deploy & Run Transactions" tab in the left-hand sidebar. Select the "ErrorHandling" contract from the dropdown menu, and then click on the "Deploy" button.
 
-Once the contract is deployed, you can interact with it by calling the greaterElement and devide function. 
+Once the contract is deployed, you can interact with it by calling the deposit, withdraw and transfer function. 
 
 
 ## Authors
