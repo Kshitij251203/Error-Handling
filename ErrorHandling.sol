@@ -1,26 +1,39 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.26;
+pragma solidity ^0.8.0;
 
-contract ErrorHandling {
+contract ErrorHandlingExample {
+    mapping(address => uint) public balances;
+    address public owner;
 
-    function greaterElement(uint a, uint b) public pure returns (uint){
-        assert(a !=b );
-        if(a > b){
-            return a;
-        }else{
-            return b;
-        }
+    constructor() {
+        owner = msg.sender;
     }
 
-    function devide(uint numerator , uint denominator) public pure returns (uint){
-       
-        require(denominator != 0,"Cannot devide by 0");
+    function deposit(uint amount) public {
+        assert(amount > 0);
+        balances[msg.sender] += amount;
+    }
 
-        if(numerator % denominator != 0){
-            revert("Numerator must be devisible by the Denominator");
+    function withdraw(uint amount) public {
+        require(amount > 0, "Withdrawal amount must be greater than zero");
+
+        if(balances[msg.sender] < amount){
+            revert("Insufficient balance");
+        }
+        
+        balances[msg.sender] -= amount;
+    }
+
+    function transfer(address recipient, uint amount) public {
+        assert(recipient != owner);
+        require(amount > 0, "Transfer amount must be greater than zero");
+        if(balances[msg.sender] < amount){
+            revert("Insufficient balance");
         }
 
-        return numerator / denominator;
+        balances[msg.sender] -= amount;
+        balances[recipient] += amount;
     }
+
     
 }
